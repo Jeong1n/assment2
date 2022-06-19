@@ -1,15 +1,43 @@
-from django.contrib.auth import login, authenticate
-from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import permissions
+from rest_framework.response import Response
+from rest_framework import status, permissions
+
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.hashers import make_password
+
+from django.views.decorators.csrf import csrf_exempt
+
+from user.serializers import UserSerializer
+from .models import User
+
+class SignUpView(APIView):
+
+    permission_class = [permissions.AllowAny]
+
+    def post(self, request):
+        # data = json.loads(request.body)
+        username = request.data.get('username', None)
+        password = request.data.get('password', None)
+        fullname = request.data.get('fullname', None)
+        email = request.data.get('email', None)
+        # User.objects.create(email=email, password=password)
+
+        passcode = make_password(password)
+        User(username=username, password=passcode, fullname=fullname, email=email).save()
+
+        return Response({"massage": f"회원가입이 완료되었습니다. {username}님 환영합니다!"}, status=status.HTTP_200_OK)
 
 class UserView(APIView): # CBV 방식
     permission_classes = [permissions.AllowAny] # 누구나 view 조회 가능
     # permission_classes = [permissions.IsAdminUser] # admin만 view 조회 가능
     # permission_classes = [permissions.IsAuthenticated] # 로그인 된 사용자만 view 조회 가능
-
+    @csrf_exempt
     def get(self, request):
-        return Response({'message': 'get method!!'})
+        user = request.user
+        # serializer에 queryset을 인자로 줄 경우 many=True 옵션을 사용해야 한다.
+        serialized_user_data = UserSerializer(user).data
+        
+        return Response(serialized_user_data,status=status.HTTP_200_OK)
         
     def post(self, request):
         return Response({'message': 'post method!!'})
@@ -36,4 +64,4 @@ class UserApiView(APIView):
         
     def delete(self, request):
         logout(request)
-        return Response({"message": "logout success"})
+        return Response({"message": "로그아웃 성공!"})
