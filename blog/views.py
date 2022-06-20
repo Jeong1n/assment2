@@ -2,14 +2,20 @@ from logging import exception
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Article, Catagorymodel
-from permission import RegistedMoreThan3daysUser
+from permission import IsAdminOrIsAuthenticatedReadOnly
+from django.utils import timezone
 
 class BlogView(APIView):
-    permission_classes = [RegistedMoreThan3daysUser]
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
 
     def get(self, request):
-        articles = Article.objects.filter(author=request.user)
-        titles = [ t['title'] for t in articles.values() ]
+        time = timezone.now()
+        articles = Article.objects.filter(user=request.user,enddate__gt=time).order_by('-startdate')
+        titles = [article.title for article in articles]
+        for article in articles:
+            if article.enddate > time:
+                titles.append(article.title)
+
         return Response({'titles': titles})
 
     def post(self, request):

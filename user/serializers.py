@@ -5,24 +5,23 @@ from blog.models import Article, Comment
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = "__all__"
+        fields = "Comment"
 
-class ArticleSerializer(serializers.ModelSerializer):
-    comment_set = CommentSerializer(many=True)
-    
+class ArticleSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Article
-        fields = ["Catagory","comment_set"]
+        fields = ["title"]
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = "introduction"
+        fields = "__all__"
 
 class UserSerializer(serializers.ModelSerializer):
     userprofile = UserProfileSerializer()
     article_set = ArticleSerializer(many=True)
+    comment_set = CommentSerializer(many=True)
     class Meta:
         model = User 
-        fields = ["username","userprofile","article_set"]
+        fields = ["username","article_set","comment_set","userprofile"]
 

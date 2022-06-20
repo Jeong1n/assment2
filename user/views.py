@@ -27,6 +27,7 @@ class SignUpView(APIView):
 
         return Response({"massage": f"회원가입이 완료되었습니다. {username}님 환영합니다!"}, status=status.HTTP_200_OK)
 
+
 class UserView(APIView): # CBV 방식
     permission_classes = [permissions.AllowAny] # 누구나 view 조회 가능
     # permission_classes = [permissions.IsAdminUser] # admin만 view 조회 가능
