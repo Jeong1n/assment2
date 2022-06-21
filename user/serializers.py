@@ -1,6 +1,8 @@
+from urllib import request
 from rest_framework import serializers
 from user.models import User, UserProfile
 from blog.models import Article, Comment
+from product.models import product
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,4 +26,10 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User 
         fields = ["username","article_set","comment_set","userprofile"]
+
+class productSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = product
+        fields = "__all__"
+
 
